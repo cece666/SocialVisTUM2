@@ -117,9 +117,9 @@
       <p> % of distance among topics required to be clustered into the same cluster</p>
        <label>
          Threshold: Minimum distance +
-        <output id="distance_threshold">50</output>% of (maximum distance - minimum distance):<br>
+        <output id="distance_threshold">12.5</output>% of maximum distance:<br>
         min
-         <input type="range" min="1" max="100" value="50" step="0.5"
+         <input type="range" min="1" max="100" value="12.5" step="0.5"
           oninput="d3.select('#distance_threshold').text(value); forceProperties.distances.distanceThreshold=value; updateAll();">max
       </label>
     </div>
@@ -263,7 +263,7 @@
     },
 
     distances:{
-      distanceThreshold:50
+      distanceThreshold:12.5
     }
   }
 
@@ -515,18 +515,28 @@
   function calculateBoundary(){
     var maxDis = 0;
     var minDis = Infinity;
+    // var clusterContainer = document.getElementById("clusterContent");
+    // clusterContainer.innerHTML += "graph nodes length " + graph.nodes.length +"<br>";
     graph.nodes.forEach(function (currNode){
-      for(var i=0; i<graph.nodes.length -1; i++) {
+
+      // var clusterContainer = document.getElementById("clusterContent");
+      // clusterContainer.innerHTML += "currNode " + currNode.id +"<br>";
+
+      for(var i=0; i<fullGraph.nodes.length -1; i++) {
         var check = 0;
         graph.nodes.forEach(function (item) {
+          // var clusterContainer = document.getElementById("clusterContent");
+          // clusterContainer.innerHTML += "item id "+ item.id + "<br>";
+          //
+          // var clusterContainer = document.getElementById("clusterContent");
+          // clusterContainer.innerHTML += "currNode " + currNode.distances[i].word +"<br>";
+
           if (item.id == currNode.distances[i].word) {
             check = 1;
           }
         });
 
         if (check) {
-          //   var clusterContainer = document.getElementById("clusterContent");
-          //   clusterContainer.innerHTML += check+"<br>";
           if (currNode.distances[i].distance < minDis) {
             minDis = currNode.distances[i].distance;
           }
@@ -537,8 +547,8 @@
       }
     });
 
-    var clusterContainer = document.getElementById("clusterContent");
-    clusterContainer.innerHTML += maxDis+ " "+ minDis+"<br>";
+    // var clusterContainer = document.getElementById("clusterContent");
+    // clusterContainer.innerHTML += maxDis+ " "+ minDis+"<br>";
 
     return [maxDis,minDis];
   }
@@ -552,7 +562,7 @@
 
     graph.nodes.forEach(function (currNode) {
       let record = 0;
-      for(var i =0; i<graph.nodes.length - 1; i++){
+      for(var i =0; i<fullGraph.nodes.length - 1; i++){
         var flag = 0;
         var check = 0;
 
@@ -561,8 +571,11 @@
             check = 1;
           }
         });
+        // var clusterContainer = document.getElementById("clusterContent");
+        // clusterContainer.innerHTML += "distance threshold"+ currNode.distances[i].distance + "<br>";
 
-        if(check && currNode.distances[i].distance < 0.01 * forceProperties.distances.distanceThreshold * (disArray[0])){
+        if(check && currNode.distances[i].distance <= 0.01 * forceProperties.distances.distanceThreshold * (disArray[0])){
+
           cluster_list.forEach(function (item){
             if((item.indexOf(currNode.id)>-1)||(item.indexOf(currNode.distances[i].word)>-1)){
               // var clusterContainer = document.getElementById("clusterContent");
